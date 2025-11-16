@@ -1,0 +1,38 @@
+//@version=5
+indicator("TFC Mean Reversion", overlay = true)
+
+
+highestLow = ta.highest(source=low, length=8) // The highest low from the last n days
+lowestHigh = ta.lowest(source=high, length=8) // The lowest high from the last n days
+
+smatr = ta.sma(ta.tr(true), 5)
+
+float overlapTop = na
+float overlapBottom = na
+float avgLow = na
+float avgHigh = na
+float midPlot = na
+float midPlotHigh = na
+float midPlotLow = na
+
+if ( highestLow < lowestHigh )
+    overlapTop := highestLow
+    overlapBottom := lowestHigh
+    midPlot := highestLow + ((lowestHigh-highestLow)/2)
+    midPlotHigh := midPlot + (smatr/2)
+    midPlotLow := midPlot - (smatr/2)
+
+avgLow := math.avg(low, low[1], low[2], low[3], low[4], low[5], low[6], low[7])
+avgHigh := math.avg(high, high[1], high[2], high[3], high[4], high[5], high[6], high[7])
+
+plot(avgLow, style=plot.style_steplinebr, color=color.rgb(255, 235, 59, 50))
+plot(avgHigh, style=plot.style_steplinebr, color=color.rgb(255, 235, 59, 50))
+
+bandLow = avgLow-smatr
+plot(bandLow, style=plot.style_stepline, color=low<bandLow?color.white:color.gray, offset = 0)
+bandHigh = avgHigh+smatr
+plot(bandHigh, style=plot.style_stepline, color=high>bandHigh?color.white:color.gray, offset = 0)
+
+mid = (high-low)/2
+plot(close-mid, style=plot.style_cross, color=color.aqua)
+plot(close+mid, style=plot.style_cross, color=color.orange)
